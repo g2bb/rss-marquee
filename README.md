@@ -1,9 +1,14 @@
+This is a modification of [Samuel Carreira's](https://github.com/samuelcarreira) clean and simple to use [RSSMarquee](https://github.com/samuelcarreira/rss-marquee) adding the functionality of reversing the RSS feed for feeds that are ordered oldest-newest.
+
+I would also like to recommend VSG24's [Cloudflare CORS Worker](https://gist.github.com/VSG24/e87c6b33169e2881ad821b4b2d4a899d) script. Simply copy and paste this into a Cloudflare worker and use `https://cors-proxy.<username>.workers.dev/corsproxy/?apiurl=<RSSURL>` in the marquee declaration to get around the CORS policy.
+
 # RSS Marquee
 Scrolling text like the old &lt;marquee> tag with a customizable RSS feed - Simple code written in Vanilla JS
 
+
 ![Sample](design/browser_sample.png)
 
-### Test it here: https://samuelcarreira.github.io/rss-marquee
+### Test the original (without reversing) here: https://samuelcarreira.github.io/rss-marquee
 
 ### Note
 I shared the code that I wrote for an older project because it can be useful to someone (just browse the JS class written). So this repository doesn't pretend to be some kind of library or anything complex.
@@ -45,6 +50,7 @@ Property         | Type     | Required    | Description
 `options.speed`  	 | `number` | no | Duration in ms per character. Bigger values = slow speed. Value between 50-300. Default value: 110
 `options.maxItems`  	 | `number` | no | specify max number of titles to show (useful to debug: not wait for all titles before goes to the next feed)
 `options.hostnameSelector`  	 | `HTMLelement` | no | The selector of the element where you want to show the URL of the news feed source (usefull for copyright atttribution)
+`options.order`  	 | `string` | no | This Property will reverse the order of the fetched RSS feed if you set it as `reverse`
 
 ## Motivation and history
 I've created this code because I needed a news feed scrolling text on a client project. After a quick search, I found some solutions, but none completely satisfies me. I didn't want to use jQuery and many libraries depend on it. Also, I want to make it at lean as possible and to take advantage of recent browser technologies with graphic acceleration, so I ditched all alternatives who use the `setInterval` function to set the animation time.

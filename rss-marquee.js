@@ -6,14 +6,18 @@
  */
 class RSSMarquee {
     /**
-     * 
+     *
      * @param {string[]} feedURLs Feed URLs
      * @param {object} elementContainer the selector of the marquee container
      * @param {number} options.speed duration in ms per character. Bigger values = slow speed
      * @param {number} options.maxItems specify max number of titles to show (useful to debug)
      * @param {object} options.hostnameSelector The selector of the element where you want to show the URL of the news feed source (usefull for copyright atttribution)
+     * @param {string} options.order The order you want to display the feed in.
      */
-    constructor(feedURLs, elementContainer, options = { speed: 110, maxItems: null, hostnameSelector: null }) {
+
+
+
+     constructor(feedURLs, elementContainer, options = { speed: 110, maxItems: null, hostnameSelector: null, order: null}) {
         this._feedURLs = new Array();
 
         if (Array.isArray(feedURLs)) {
@@ -47,6 +51,7 @@ class RSSMarquee {
             speed: this.validateSpeed(options.speed),
             maxItems: options.maxItems,
             hostnameSelector: options.hostnameSelector,
+            order: options.order
             // ...options
         };
 
@@ -76,7 +81,7 @@ class RSSMarquee {
 
     /**
      * Validate URL (uses URL interface)
-     * 
+     *
      * @param {string} url Url to check
      * @returns {boolean} true if valid
      */
@@ -91,10 +96,10 @@ class RSSMarquee {
 
     /**
      * Get Hostname from url string
-     * 
+     *
      * Sample: "http://www.dnoticias.pt/rss/desporto.xml"
      *         returns -> www.dnoticias.pt
-     * 
+     *
      * @param {string} url url string
      * @returns {string} hostname
      */
@@ -183,7 +188,7 @@ class RSSMarquee {
                 easing: 'linear', // The rate of the animation's change over time. Accepts the pre-defined values "linear", "ease", "ease-in", "ease-out", and "ease-in-out", or a custom "cubic-bezier" value like "cubic-bezier(0.42, 0, 0.58, 1)". Defaults to "linear".
                 iterations: 1, // The number of times the animation should repeat. Defaults to 1, and can also take a value of Infinity to make it repeat for as long as the element exists.
                 delay: 0, // The number of milliseconds to delay the start of the animation. Defaults to 0.
-                endDelay: 0 // The number of milliseconds to delay after the end of an animation. This is primarily of use when sequencing animations based on the end time of another animation. Defaults to 0. 
+                endDelay: 0 // The number of milliseconds to delay after the end of an animation. This is primarily of use when sequencing animations based on the end time of another animation. Defaults to 0.
             };
 
             animOptions.duration = text.length * this._options.speed;
@@ -224,7 +229,7 @@ class RSSMarquee {
     }
 
     /**
-     * Fetch RSS 
+     * Fetch RSS
      * @param {string} feedURL RSS XML url
      */
     fetchRSS(feedURL) {
@@ -247,13 +252,14 @@ class RSSMarquee {
 
     /**
      * Parses RSS XML feed
-     * 
+     *
      * - Select title elementContainer
      * - add dot separator between "headlines"
      * - remove <![CDATA[ string
      * - remove html tags
-     * 
-     * @param {string} xmlText 
+     *
+     * @param {string} xmlText
+     * @param {string} order
      * @returns {string} parsed feed
      */
     parseXMLFeed(xmlText) {
@@ -261,10 +267,21 @@ class RSSMarquee {
             const parser = new DOMParser();
             const doc = parser.parseFromString(xmlText, "text/xml");
 
+            var dirDoc = doc;
+            if(this._options.order == "reverse"){
+                var nodes = doc.getElementsByTagName("item");
+                var revDoc = parser.parseFromString("<CATALOG></CATALOG>","text/xml");
+                var catalog = revDoc.childNodes[0];
+                for (var i = nodes.length - 1; i >= 0; --i) {
+                    catalog.appendChild(nodes[i]);
+                };
+                dirDoc = revDoc;
+            }
+
             let news = '';
             let totals = 0;
 
-            for (let item of doc.querySelectorAll('item')) {
+            for (let item of dirDoc.querySelectorAll('item')) {
                 let title = item.getElementsByTagName("title")[0].childNodes[0].nodeValue;
                 // let description = item.getElementsByTagName("description")[0].childNodes[0].nodeValue;
 
